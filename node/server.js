@@ -12,6 +12,11 @@ const stat = util.promisify(fs.stat);
 const access = util.promisify(fs.access);
 const bagpipe = new Bagpipe(7);
 const crypto = require('crypto');
+const normalize = path.normalize;
+const join = path.join;
+const sep = path.sep;
+const www = 'public';
+const root = normalize(__dirname + sep + www + sep);
 
 /*
  * These lines will attempt to read your subscription key from an environment
@@ -39,11 +44,11 @@ if (subscriptionKeys.length < 1) {
   throw new Error('Environment variable for your subscription key is not set.')
 };
 
-var textToSpeech = function(text, name, stream, count, callback) {
+var textToSpeech = function(text, type, stream, count, callback) {
 	//This is the callback to our saveAudio function.
     // It takes a single argument, which is the returned accessToken.
 //	console.log(text + ' start');
-    saveAudio(text, name, stream, count, callback);
+    saveAudio(text, type, stream, count, callback);
 }
 
 //var accessToken = '';
@@ -115,7 +120,7 @@ var saveAudio = async function(text, name, stream, count, callback) {
  try {
      //await access(filePath, fs.constants.F_OK);
      let stats = await stat(filePath);
-     console.log('stats.isFile()', stats.isFile());
+     //console.log('stats.isFile()', stats.isFile());
      if(stats.isFile()) {
         let readStream = fs.createReadStream(filePath);
         readStream.pipe(stream).on('finish', callback);
@@ -194,13 +199,12 @@ var saveAudio = async function(text, name, stream, count, callback) {
 var get = function(n) {
 	let text = '你好' + n;
 	let filename = __dirname + '/test' + n + 'sample.wav';
-	textToSpeech(text, name, fs.createWriteStream(filename), 0, function(){
+	textToSpeech(text, type, fs.createWriteStream(filename), 0, function(){
 		console.log('test ok ' + n);
 	});
 }
 
 let start_server = true;
-
 if(!start_server) {
 	setTimeout(() => {
 	//	for(let i = 0; i < 200; i++) {
@@ -216,32 +220,128 @@ if(!start_server) {
 	let port = 80;
 	http.createServer(function(req, res) {
         console.log('req.url', req.url);
-		let arg = querystring.parse(url.parse(req.url).query);
-//		console.log(arg);
-		let text = arg.text;
-		let name = arg.name;
-        if(name === undefined) {
-            name = 'zh-CN-XiaoxiaoNeural';
+        var pathname = url.parse(req.url).pathname;
+        var pathfile = normalize(join(root, pathname));
+        // malicious path
+        if ((pathfile + sep).substr(0, root.length) !== root) {
+            console.error('malicious path "' + pathfile + '"');
+            res.writeHead(403);
+            res.end('malicious path "' + pathfile + '"\n');
+            return;
         }
-//		console.log(text + ' begin');
-		if(text !== undefined) {
-			//Start the sample app.
-			res.writeHead(200, {
-				'Content-Type' : 'audio/wav'
-			});
-//			textToSpeech(text, fs.createWriteStream('sample2.wav'), 0);
-//			textToSpeech(text, res, 0, function(){
-//				console.log(text + ' ok1');
-//			});
-			bagpipe.push(textToSpeech, text, name, res, 0, function() {
-				console.log(text + ' ok1');
-			});
-		} else {
-			res.writeHead(200, {
-				'Content-Type' : 'text/plain'
-			});
-			res.end('error\n');
-		}
+        if (path.extname(pathfile) == "") {
+            if(pathfile.endsWith('\\')) {
+                pathfile += "index.html";
+            }
+        }
+        fs.stat(pathfile, function(stat_error, stat) {
+            if (!stat_error && stat.isFile()) {
+                switch (path.extname(pathfile)) {
+                case ".html":
+                    res.writeHead(200, {
+                        "Content-Type" : "text/html",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                case ".js":
+                    res.writeHead(200, {
+                        "Content-Type" : "text/javascript",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                case ".json":
+                    res.writeHead(200, {
+                        "Content-Type" : "application/json",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache",
+                        "Access-Control-Allow-Origin" : "*",
+                        "Access-Control-Allow-Headers" : "Content-Type,Content-Length, Authorization, Accept,X-Requested-With",
+                        "Access-Control-Allow-Methods" : "PUT,POST,GET,DELETE,OPTIONS",
+                    });
+                    break;
+                case ".css":
+                    res.writeHead(200, {
+                        "Content-Type" : "text/css",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                case ".gif":
+                    res.writeHead(200, {
+                        "Content-Type" : "image/gif",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                case ".jpg":
+                    res.writeHead(200, {
+                        "Content-Type" : "image/jpeg",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                case ".png":
+                    res.writeHead(200, {
+                        "Content-Type" : "image/png",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    break;
+                default:
+                    res.writeHead(200, {
+                        "Content-Type" : "application/octet-stream",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                }
+                fs.readFile(pathfile, function(err, data) {
+                    res.end(data);
+                });
+            } else {
+                let arg = querystring.parse(url.parse(req.url).query);
+                let text = arg.text;
+                let type = arg.type;
+                if(type === undefined) {
+                    type = 'zh-CN-XiaoxiaoNeural';
+                }
+                if(text !== undefined) {
+                    //Start the sample app.
+                    console.log('pathname', pathname);
+                    if(pathname == '/download') {
+                        let md5 = crypto.createHash('md5');
+                        let result = md5.update(text + '_' + type).digest('hex');
+                        res.writeHead(200, {
+                            'Content-Type' : 'application/octet-stream',
+                            'Content-Disposition': 'attachment; filename="' + result + '.mp3"'
+                        });
+                    } else {
+                        res.writeHead(200, {
+                            'Content-Type' : 'audio/wav'
+                        });
+                    }
+        			// textToSpeech(text, fs.createWriteStream('sample2.wav'), 0);
+        			// textToSpeech(text, res, 0, function(){
+        			// 	console.log('send', text);
+        			// });
+                    bagpipe.push(textToSpeech, text, type, res, 0, function() {
+                        console.log('send', text);
+                    });
+                } else {
+                    // res.writeHead(200, {
+                    //     'Content-Type' : 'text/plain'
+                    // });
+                    // res.end('error\n');
+                    res.writeHead(404, {
+                        "Content-Type" : "text/html",
+                        "Cache-Control" : "no-store, no-cache, must-revalidate",
+                        "Pragma" : "no-cache"
+                    });
+                    res.end("<h1>404 Not Found</h1>");
+                }
+            }
+        });
 	}).listen(port, '0.0.0.0');
 	console.log('start ready ' + port);
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>神经网络语音</title>
+<script type="text/javascript">
+    var audo = function() {
+        let text = document.getElementById('text').value;
+        let types = document.getElementsByName('type');
+        let type;
+        for(let t in types) {
+            if(types[t].checked) {
+                type = types[t].value;
+                break;
+            }
+        }
+        if(!window.audios) {
+            window.audios = {};
+        }
+        if(window.audios[text + '_' + type] === undefined) {
+            var audourl = '/audo?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type;
+            window.audios[text + '_' + type] = new Audio(audourl);
+        }
+        window.audios[text + '_' + type].play();
+    };
+    var download = function() {
+        let text = document.getElementById('text').value;
+        let types = document.getElementsByName('type');
+        let type;
+        for(let t in types) {
+            if(types[t].checked) {
+                type = types[t].value;
+                break;
+            }
+        }
+        var audourl = '/download?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type;
+        location.href = audourl;
+    };
+</script>
+</head>
+<body>
+		<div>
+			<textarea id="text" name="text" style="width: 815px; height: 233px;">以太坊是一个去中心化的开源区块链系统，它拥有自己的原生加密货币——以太币。以太坊还是很多其他加密货币的运行平台，同时它也可以执行去中心化智能合约。
+            </textarea>
+		</div>
+		<div>
+			<input type="radio" value="zh-CN-XiaohanNeural" name="type">女1
+			<input type="radio" value="zh-CN-XiaomoNeural" name="type">女2
+			<input type="radio" value="zh-CN-XiaoruiNeural" name="type">女3
+			<input type="radio" value="zh-CN-XiaoxiaoNeural" name="type" checked>女4
+			<input type="radio" value="zh-CN-XiaoxuanNeural" name="type">女5
+			<input type="radio" value="zh-CN-XiaoyouNeural" name="type">女5
+			<input type="radio" value="zh-CN-YunxiNeural" name="type">男1
+			<input type="radio" value="zh-CN-YunyangNeural" name="type">男2
+			<input type="radio" value="zh-CN-YunyeNeural" name="type">男3
+		</div>
+		<div>
+			<input type="button" value="播放" onclick="audo();">
+            <input type="button" value="下载" onclick="download();">
+		</div>
+</body>
+</html>
