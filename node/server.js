@@ -44,11 +44,11 @@ if (subscriptionKeys.length < 1) {
   throw new Error('Environment variable for your subscription key is not set.')
 };
 
-var textToSpeech = function(text, type, role, style, stream, count, callback) {
+var textToSpeech = function(text, type, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
 	//This is the callback to our saveAudio function.
     // It takes a single argument, which is the returned accessToken.
 //	console.log(text + ' start');
-    saveAudio(text, type, role, style, stream, count, callback);
+    saveAudio(text, type, role, style, rate, pitch, volume, contour, lang, stream, count, callback);
 }
 
 //var accessToken = '';
@@ -111,20 +111,47 @@ var getAccessTokens = function() {
 //You can also change the voice and output formats. See:
 //https://docs.microsoft.com/azure/cognitive-services/speech-service/language-support#text-to-speech
 //http://voice.qhkly.com:20080/?text=%E5%8F%AF%E4%BB%A5%E5%95%8A%EF%BC%8C%E4%BD%A0%E6%98%AF%E6%80%8E%E4%B9%88%E6%83%B3%E7%9A%84
-var saveAudio = async function(text, name, role, style, stream, count, callback) {
- console.log('text', text);
+/**
+ * name 发音者
+ * role 扮演
+ * style 风格
+ * rate 语速
+ * pitch 音高
+ * volume 音量
+ * contour 音调
+ * lang 语言
+ */
+var saveAudio = async function(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
  let time = (new Date()).getTime();
  let md5 = crypto.createHash('md5');
  if(name === undefined) {
-     name = 'zh-CN-XiaoxiaoNeural';
+     name = 'zh-CN-XiaoxiaoNeural';//发音者
  }
  if(role === undefined) {
-     role = 'Default';
+     role = 'Default';//扮演
  }
  if(style === undefined) {
-     style = 'Default';//calm平静
+     style = 'Default';//风格calm平静
  }
- let result = md5.update(text + '_' + name + '_' + role + '_' + style).digest('hex');
+ if(rate === undefined) {
+     rate = '0';//语速
+ }
+ if(pitch === undefined) {
+     pitch = '0';//音高
+ }
+ if(volume === undefined) {
+     volume = '0';//音量
+ }
+ if(contour === undefined) {
+     contour = '';//音调
+ }
+ if(lang === undefined) {
+     lang = 'zh-CN';//语言
+ }
+ console.log('lang', lang);
+ let key = text + '_' + name + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+ console.log('key', key);
+ let result = md5.update(key).digest('hex');
  let filePath = __dirname + path.sep + 'wav' + path.sep + result + '.wav';
  try {
      //await access(filePath, fs.constants.F_OK);
@@ -139,24 +166,15 @@ var saveAudio = async function(text, name, role, style, stream, count, callback)
     console.log('not have', text);
     let accessToken = getAccessTokens();
     //  let speak_body = '<speak version=\'1.0\' xmlns="http://www.w3.org/2001/10/synthesis" xml:lang=\'zh-CN\'>\n<voice  name=\'Microsoft Server Speech Text to Speech Voice (zh-CN, HuihuiRUS)\'>' + text + '</voice> </speak>';
-    let speak_body;
-    if(role != 'Default') {
-        speak_body = '<speak version=\'1.0\' xmlns=\'http://www.w3.org/2001/10/synthesis\' xmlns:mstts=\'https://www.w3.org/2001/mstts\' xml:lang=\'zh-CN\'>\n\
+    let speak_body = '<speak version=\'1.0\' xmlns=\'http://www.w3.org/2001/10/synthesis\' xmlns:mstts=\'https://www.w3.org/2001/mstts\' xml:lang=\'' + lang + '\'>\n\
             <voice name=\'' + name + '\'>\
             <mstts:express-as role=\'' + role + '\' style=\'' + style+ '\'>\
+            <prosody rate=\'+' + rate + '.00%\' pitch=\'+' + pitch + '.00%\' volume=\'+' + volume + '.00%\' contour=\'' + contour + '\' >\
             ' + text + '\
+            </prosody>\
             </mstts:express-as>\
             </voice>\
             </speak>';
-    } else {
-        speak_body = '<speak version=\'1.0\' xmlns=\'http://www.w3.org/2001/10/synthesis\' xmlns:mstts=\'https://www.w3.org/2001/mstts\' xml:lang=\'zh-CN\'>\n\
-            <voice name=\'' + name + '\'>\
-            <mstts:express-as style=\'' + style + '\'>\
-            ' + text + '\
-            </mstts:express-as>\
-            </voice>\
-            </speak>';
-    }
     // console.log(speak_body);
     let options = {
         method: 'POST',
@@ -219,7 +237,7 @@ var saveAudio = async function(text, name, role, style, stream, count, callback)
 var get = function(n) {
 	let text = '你好' + n;
 	let filename = __dirname + '/test' + n + 'sample.wav';
-	textToSpeech(text, undefined, undefined, undefined, fs.createWriteStream(filename), 0, function(){
+	textToSpeech(text, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, fs.createWriteStream(filename), 0, function(){
 		console.log('test ok ' + n);
 	});
 }
@@ -239,7 +257,7 @@ if(!start_server) {
 } else {
 	let port = 80;
 	http.createServer(function(req, res) {
-        console.log('req.url', req.url);
+        //console.log('req.url', req.url);
         var pathname = url.parse(req.url).pathname;
         var pathfile = normalize(join(root, pathname));
         // malicious path
@@ -326,19 +344,40 @@ if(!start_server) {
                     let type = arg.type;
                     let role = arg.role;
                     let style = arg.style;
+                    let rate = arg.rate;
+                    let pitch = arg.pitch;
+                    let volume = arg.volume;
+                    let contour = arg.contour;
+                    let lang = arg.lang;
                     if(type === undefined) {
-                        type = 'zh-CN-XiaoxiaoNeural';
+                        type = 'zh-CN-XiaoxiaoNeural';//发音者
                     }
                     if(role === undefined) {
-                        role = 'Default';
+                        role = 'Default';//扮演
                     }
                     if(style === undefined) {
-                        style = 'Default';//calm平静
+                        style = 'Default';//风格calm平静
+                    }
+                    if(rate === undefined) {
+                        rate = '0';//语速
+                    }
+                    if(pitch === undefined) {
+                        pitch = '0';//音高
+                    }
+                    if(volume === undefined) {
+                        volume = '0';//音量
+                    }
+                    if(contour === undefined) {
+                        contour = '';//音调
+                    }
+                    if(lang === undefined) {
+                        lang = 'zh-CN';//语言
                     }
                     //Start the sample app.
                     if(pathname == '/download') {
                         let md5 = crypto.createHash('md5');
-                        let result = md5.update(text + '_' + type + '_' + role + '_' + style).digest('hex');
+                        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+                        let result = md5.update(key).digest('hex');
                         res.writeHead(200, {
                             'Content-Type' : 'application/octet-stream',
                             'Content-Disposition': 'attachment; filename="' + result + '.mp3"'
@@ -352,7 +391,7 @@ if(!start_server) {
         			// textToSpeech(text, res, 0, function(){
         			// 	console.log('send', text);
         			// });
-                    bagpipe.push(textToSpeech, text, type, role, style, res, 0, function() {
+                    bagpipe.push(textToSpeech, text, type, role, style, rate, pitch, volume, contour, lang, res, 0, function() {
                         console.log('send', text);
                     });
                 } else {

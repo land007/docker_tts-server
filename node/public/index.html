@@ -8,6 +8,11 @@
         let text = document.getElementById('text').value;
         let role = document.getElementById('role').value;
         let style = document.getElementById('style').value;
+        let rate = document.getElementById('rate').value;
+        let pitch = document.getElementById('pitch').value;
+        let volume = document.getElementById('volume').value;
+        let contour = document.getElementById('contour').value;
+        let lang = document.getElementById('lang').value;//zh-CN
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -19,16 +24,23 @@
         if(!window.audios) {
             window.audios = {};
         }
-        if(window.audios[text + '_' + type + '_' + role + '_' + style] === undefined) {
-            var audourl = '/audo?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type + '&role=' + role + '&style=' + style;
-            window.audios[text + '_' + type] = new Audio(audourl);
+        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+        console.log('key', key);
+        if(window.audios[key] === undefined) {
+            var audourl = '/audo?text=' + encodeURI(text) + '&type=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
+            window.audios[key] = new Audio(audourl);
         }
-        window.audios[text + '_' + type].play();
+        window.audios[key].play();
     };
     var download = function() {
         let text = document.getElementById('text').value;
         let role = document.getElementById('role').value;
         let style = document.getElementById('style').value;
+        let rate = document.getElementById('rate').value;
+        let pitch = document.getElementById('pitch').value;
+        let volume = document.getElementById('volume').value;
+        let contour = document.getElementById('contour').value;
+        let lang = document.getElementById('lang').value;//zh-CN
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -37,15 +49,14 @@
                 break;
             }
         }
-        var audourl = '/download?text=' + encodeURI(text) + '&lang=zh-CN&&type=' + type + '&role=' + role + '&style=' + style;
+        var audourl = '/download?text=' + encodeURI(text) + '&&type=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
         location.href = audourl;
     };
 </script>
 </head>
 <body>
 		<div>
-			<textarea id="text" name="text" style="width: 815px; height: 233px;">以太坊是一个去中心化的开源区块链系统，它拥有自己的原生加密货币——以太币。以太坊还是很多其他加密货币的运行平台，同时它也可以执行去中心化智能合约。
-            </textarea>
+			<textarea id="text" name="text" style="width: 815px; height: 233px;">以太坊是一个去中心化的开源区块链系统，它拥有自己的原生加密货币——以太币。以太坊还是很多其他加密货币的运行平台，同时它也可以执行去中心化智能合约。</textarea>
 		</div>
 		<div>
 			<input type="radio" value="zh-CN-YunxiNeural" name="type">云希（男、年轻）
@@ -99,6 +110,18 @@
                 <option value="serious">严肃</option>
                 <option value="affectionate">温柔</option>
             </select>
+		</div>
+		<div>
+            语言
+			<input id="lang" type="text" value="zh-CN">
+            语速
+			<input id="rate" type="text" value="0">
+            音高
+			<input id="pitch" type="text" value="0">
+            音量
+			<input id="volume" type="text" value="0">
+            音调
+			<input id="contour" type="text" value="">
 			<input type="button" value="播放" onclick="audo();">
             <input type="button" value="下载" onclick="download();">
 		</div>
