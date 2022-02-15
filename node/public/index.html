@@ -6,6 +6,8 @@
 <script type="text/javascript">
     var audo = function() {
         let text = document.getElementById('text').value;
+        let role = document.getElementById('role').value;
+        let style = document.getElementById('style').value;
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -17,14 +19,16 @@
         if(!window.audios) {
             window.audios = {};
         }
-        if(window.audios[text + '_' + type] === undefined) {
-            var audourl = '/audo?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type;
+        if(window.audios[text + '_' + type + '_' + role + '_' + style] === undefined) {
+            var audourl = '/audo?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type + '&role=' + role + '&style=' + style;
             window.audios[text + '_' + type] = new Audio(audourl);
         }
         window.audios[text + '_' + type].play();
     };
     var download = function() {
         let text = document.getElementById('text').value;
+        let role = document.getElementById('role').value;
+        let style = document.getElementById('style').value;
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -33,7 +37,7 @@
                 break;
             }
         }
-        var audourl = '/download?text=' + encodeURI(text) + '&lang=zh-CN&type=' + type;
+        var audourl = '/download?text=' + encodeURI(text) + '&lang=zh-CN&&type=' + type + '&role=' + role + '&style=' + style;
         location.href = audourl;
     };
 </script>
@@ -42,6 +46,11 @@
 		<div>
 			<textarea id="text" name="text" style="width: 815px; height: 233px;">以太坊是一个去中心化的开源区块链系统，它拥有自己的原生加密货币——以太币。以太坊还是很多其他加密货币的运行平台，同时它也可以执行去中心化智能合约。
             </textarea>
+		</div>
+		<div>
+			<input type="radio" value="zh-CN-YunxiNeural" name="type">云希（男、年轻）
+			<input type="radio" value="zh-CN-YunyangNeural" name="type">云扬（男、年轻）
+			<input type="radio" value="zh-CN-YunyeNeural" name="type">云野（男、中年）
 		</div>
 		<div>
 			<input type="radio" value="zh-CN-XiaochenNeural" name="type">晓辰（女、年轻）
@@ -60,13 +69,36 @@
 		</div>
 		<div>
 			<input type="radio" value="zh-CN-XiaoyouNeural" name="type">晓悠（女孩）
-		</div>
-		<div>
-			<input type="radio" value="zh-CN-YunxiNeural" name="type">云希（男、年轻）
-			<input type="radio" value="zh-CN-YunyangNeural" name="type">云扬（男、年轻）
-			<input type="radio" value="zh-CN-YunyeNeural" name="type">云野（男、中年）
-		</div>
-		<div>
+            角色扮演
+			<select id="role" >
+                <option value="Default">默认</option>
+                <option value ="YoungAdultMale">男青年</option>
+                <option value ="YoungAdultFemale">女青年</option>
+                <option value ="OlderAdultMale">男中年</option>
+                <option value ="OlderAdultFemale">女中年</option>
+                <option value ="SeniorMale">男老年</option>
+                <option value ="SeniorFemale">女老年</option>
+                <option value ="Boy">男孩</option>
+                <option value ="Girl">女孩</option>
+            </select>
+            说话风格
+			<select id="style" >
+                <option value="Default">默认</option>
+                <option value="volvo">平静</option>
+                <option value="cheerful">开心</option>
+                <option value="sad">悲伤</option>
+                <option value="angry">愤怒</option>
+                <option value="fearful">恐惧</option>
+                <option value="disgruntled">不满</option>
+                <option value="serious">严厉</option>
+                <option value="disgruntled">不满</option>
+                <option value="affectionate">撒娇</option>
+                <option value="gentle">温柔</option>
+                <option value="depressed">沮丧</option>
+                <option value="embarrassed">尴尬</option>
+                <option value="serious">严肃</option>
+                <option value="affectionate">温柔</option>
+            </select>
 			<input type="button" value="播放" onclick="audo();">
             <input type="button" value="下载" onclick="download();">
 		</div>
