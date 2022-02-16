@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>神经网络语音</title>
 <script type="text/javascript">
-    var audo = function() {
+    var getKey = function(){
         let text = document.getElementById('text').value;
         let role = document.getElementById('role').value;
         let style = document.getElementById('style').value;
@@ -21,36 +21,53 @@
                 break;
             }
         }
+        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+        return key;
+    };
+    var getURL = function(){
+        let text = document.getElementById('text').value;
+        let role = document.getElementById('role').value;
+        let style = document.getElementById('style').value;
+        let rate = document.getElementById('rate').value;
+        let pitch = document.getElementById('pitch').value;
+        let volume = document.getElementById('volume').value;
+        let contour = document.getElementById('contour').value;
+        let lang = document.getElementById('lang').value;//zh-CN
+        let types = document.getElementsByName('type');
+        let type;
+        for(let t in types) {
+            if(types[t].checked) {
+                type = types[t].value;
+                break;
+            }
+        }
+        let url = 'text=' + encodeURI(text) + '&type=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
+        return url;
+    };
+    var stop = function(){
+        var key = getKey();
+        console.log('key', key);
+        if(window.audios[key] !== undefined) {
+            window.audios[key].pause();
+        }
+    };
+    var start = function() {
+        var key = getKey();
+        var url = getURL();
+        console.log('key', key);
         if(!window.audios) {
             window.audios = {};
         }
-        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
-        console.log('key', key);
         if(window.audios[key] === undefined) {
-            var audourl = '/audo?text=' + encodeURI(text) + '&type=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
-            window.audios[key] = new Audio(audourl);
+            window.audios[key] = new Audio('/audo?' + url);
         }
         window.audios[key].play();
     };
     var download = function() {
-        let text = document.getElementById('text').value;
-        let role = document.getElementById('role').value;
-        let style = document.getElementById('style').value;
-        let rate = document.getElementById('rate').value;
-        let pitch = document.getElementById('pitch').value;
-        let volume = document.getElementById('volume').value;
-        let contour = document.getElementById('contour').value;
-        let lang = document.getElementById('lang').value;//zh-CN
-        let types = document.getElementsByName('type');
-        let type;
-        for(let t in types) {
-            if(types[t].checked) {
-                type = types[t].value;
-                break;
-            }
-        }
-        var audourl = '/download?text=' + encodeURI(text) + '&&type=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
-        location.href = audourl;
+        var key = getKey();
+        var url = getURL();
+        console.log('key', key);
+        location.href = '/download?' + url;
     };
 </script>
 </head>
@@ -122,7 +139,8 @@
 			<input id="volume" type="text" value="0">
             音调
 			<input id="contour" type="text" value="">
-			<input type="button" value="播放" onclick="audo();">
+			<input type="button" value="播放" onclick="start();">
+			<input type="button" value="暂停" onclick="stop();">
             <input type="button" value="下载" onclick="download();">
 		</div>
 </body>

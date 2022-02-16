@@ -384,7 +384,12 @@ if(!start_server) {
                         });
                     } else {
                         res.writeHead(200, {
-                            'Content-Type' : 'audio/wav'
+                            'Content-Type' : 'audio/wav',
+                            "Cache-Control" : "no-store, no-cache, must-revalidate",
+                            "Pragma" : "no-cache",
+                            "Access-Control-Allow-Origin" : "*",
+                            "Access-Control-Allow-Headers" : "Content-Type,Content-Length, Authorization, Accept,X-Requested-With",
+                            "Access-Control-Allow-Methods" : "PUT,POST,GET,DELETE,OPTIONS",
                         });
                     }
         			// textToSpeech(text, fs.createWriteStream('sample2.wav'), 0);
