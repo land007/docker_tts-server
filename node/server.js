@@ -44,11 +44,11 @@ if (subscriptionKeys.length < 1) {
   throw new Error('Environment variable for your subscription key is not set.')
 };
 
-var textToSpeech = function(text, type, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
+var textToSpeech = function(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
 	//This is the callback to our saveAudio function.
     // It takes a single argument, which is the returned accessToken.
 //	console.log(text + ' start');
-    saveAudio(text, type, role, style, rate, pitch, volume, contour, lang, stream, count, callback);
+    saveAudio(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback);
 }
 
 //var accessToken = '';
@@ -341,7 +341,7 @@ if(!start_server) {
                 let arg = querystring.parse(url.parse(req.url).query);
                 let text = arg.text;
                 if(text !== undefined) {
-                    let type = arg.type;
+                    let name = arg.name;
                     let role = arg.role;
                     let style = arg.style;
                     let rate = arg.rate;
@@ -349,8 +349,8 @@ if(!start_server) {
                     let volume = arg.volume;
                     let contour = arg.contour;
                     let lang = arg.lang;
-                    if(type === undefined) {
-                        type = 'zh-CN-XiaoxiaoNeural';//发音者
+                    if(name === undefined) {
+                        name = 'zh-CN-XiaoxiaoNeural';//发音者
                     }
                     if(role === undefined) {
                         role = 'Default';//扮演
@@ -376,7 +376,7 @@ if(!start_server) {
                     //Start the sample app.
                     if(pathname == '/download') {
                         let md5 = crypto.createHash('md5');
-                        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+                        let key = text + '_' + name + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
                         let result = md5.update(key).digest('hex');
                         res.writeHead(200, {
                             'Content-Type' : 'application/octet-stream',
@@ -384,19 +384,14 @@ if(!start_server) {
                         });
                     } else {
                         res.writeHead(200, {
-                            'Content-Type' : 'audio/wav',
-                            "Cache-Control" : "no-store, no-cache, must-revalidate",
-                            "Pragma" : "no-cache",
-                            "Access-Control-Allow-Origin" : "*",
-                            "Access-Control-Allow-Headers" : "Content-Type,Content-Length, Authorization, Accept,X-Requested-With",
-                            "Access-Control-Allow-Methods" : "PUT,POST,GET,DELETE,OPTIONS",
+                            'Content-Type' : 'audio/wav'
                         });
                     }
         			// textToSpeech(text, fs.createWriteStream('sample2.wav'), 0);
         			// textToSpeech(text, res, 0, function(){
         			// 	console.log('send', text);
         			// });
-                    bagpipe.push(textToSpeech, text, type, role, style, rate, pitch, volume, contour, lang, res, 0, function() {
+                    bagpipe.push(textToSpeech, text, name, role, style, rate, pitch, volume, contour, lang, res, 0, function() {
                         console.log('send', text);
                     });
                 } else {
