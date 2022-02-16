@@ -46,28 +46,29 @@
     };
     var stop = function(){
         var key = getKey();
-        console.log('key', key);
         if(window.audios[key] !== undefined) {
             window.audios[key].pause();
         }
     };
     var start = function() {
-        var key = getKey();
-        var url = getURL();
-        console.log('key', key);
+        let key = getKey();
+        let url = getURL();
         if(!window.audios) {
             window.audios = {};
         }
         if(window.audios[key] === undefined) {
-            window.audios[key] = new Audio('/audo?' + url);
+            let src = 'https://docx.qhkly.com:20080/audo?' + url;
+            console.log('src', src);
+            window.audios[key] = new Audio(src);
         }
         window.audios[key].play();
     };
     var download = function() {
-        var key = getKey();
-        var url = getURL();
-        console.log('key', key);
-        location.href = '/download?' + url;
+        let key = getKey();
+        let url = getURL();
+        let src = 'https://docx.qhkly.com:20080/download?' + url;
+        console.log('src', src);
+        location.href = src;
     };
 </script>
 </head>
