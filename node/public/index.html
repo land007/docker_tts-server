@@ -13,6 +13,7 @@
         let volume = document.getElementById('volume').value;
         let contour = document.getElementById('contour').value;
         let lang = document.getElementById('lang').value;//zh-CN
+        let format = document.getElementById('format').value;
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -21,7 +22,7 @@
                 break;
             }
         }
-        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang + '_' + format;
         return key;
     };
     var getURL = function(){
@@ -33,6 +34,7 @@
         let volume = document.getElementById('volume').value;
         let contour = document.getElementById('contour').value;
         let lang = document.getElementById('lang').value;//zh-CN
+        let format = document.getElementById('format').value;
         let types = document.getElementsByName('type');
         let type;
         for(let t in types) {
@@ -41,7 +43,7 @@
                 break;
             }
         }
-        let url = 'text=' + encodeURI(text) + '&name=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
+        let url = 'text=' + encodeURI(text) + '&name=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang+ '&format=' + format;
         return url;
     };
     var stop = function(){
@@ -140,6 +142,35 @@
 			<input id="volume" type="text" value="0">
             音调
 			<input id="contour" type="text" value="">
+            文件格式
+            <!-- https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/rest-text-to-speech#audio-outputs -->
+			<select id="format" >
+                <option value="riff-16khz-16bit-mono-pcm">riff-16khz-16bit-mono-pcm</option>
+                <option value="riff-24khz-16bit-mono-pcm" selected="selected">riff-24khz-16bit-mono-pcm</option>
+                <option value="riff-48khz-16bit-mono-pcm">riff-48khz-16bit-mono-pcm</option>
+                <option value="riff-8khz-8bit-mono-mulaw">riff-8khz-8bit-mono-mulaw</option>
+                <option value="riff-8khz-8bit-mono-alaw">riff-8khz-8bit-mono-alaw</option>
+                <option value="audio-16khz-32kbitrate-mono-mp3">audio-16khz-32kbitrate-mono-mp3</option>
+                <option value="audio-16khz-64kbitrate-mono-mp3">audio-16khz-64kbitrate-mono-mp3</option>
+                <option value="audio-16khz-128kbitrate-mono-mp3">audio-16khz-128kbitrate-mono-mp3</option>
+                <option value="audio-24khz-48kbitrate-mono-mp3">audio-24khz-48kbitrate-mono-mp3</option>
+                <option value="audio-24khz-96kbitrate-mono-mp3">audio-24khz-96kbitrate-mono-mp3</option>
+                <option value="audio-24khz-160kbitrate-mono-mp3">audio-24khz-160kbitrate-mono-mp3</option>
+                <option value="audio-48khz-96kbitrate-mono-mp3">audio-48khz-96kbitrate-mono-mp3</option>
+                <option value="audio-48khz-192kbitrate-mono-mp3">audio-48khz-192kbitrate-mono-mp3</option>
+                <option value="webm-16khz-16bit-mono-opus">webm-16khz-16bit-mono-opus</option>
+                <option value="webm-24khz-16bit-mono-opus">webm-24khz-16bit-mono-opus</option>
+                <option value="ogg-16khz-16bit-mono-opus">ogg-16khz-16bit-mono-opus</option>
+                <option value="ogg-24khz-16bit-mono-opus">ogg-24khz-16bit-mono-opus</option>
+                <option value="ogg-48khz-16bit-mono-opus">ogg-48khz-16bit-mono-opus</option>
+                <option value="raw-8khz-8bit-mono-mulaw">raw-8khz-8bit-mono-mulaw</option>
+                <option value="raw-8khz-8bit-mono-alaw">raw-8khz-8bit-mono-alaw</option>
+                <option value="raw-16khz-16bit-mono-pcm">raw-16khz-16bit-mono-pcm</option>
+                <option value="raw-24khz-16bit-mono-pcm">raw-24khz-16bit-mono-pcm</option>
+                <option value="raw-48khz-16bit-mono-pcm">raw-48khz-16bit-mono-pcm</option>
+                <option value="raw-16khz-16bit-mono-truesilk">raw-16khz-16bit-mono-truesilk</option>
+                <option value="raw-24khz-16bit-mono-truesilk">raw-24khz-16bit-mono-truesilk</option>
+            </select>
 			<input type="button" value="播放" onclick="start();">
 			<input type="button" value="暂停" onclick="stop();">
             <input type="button" value="下载" onclick="download();">

@@ -44,11 +44,11 @@ if (subscriptionKeys.length < 1) {
   throw new Error('Environment variable for your subscription key is not set.')
 };
 
-var textToSpeech = function(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
+var textToSpeech = function(text, name, role, style, rate, pitch, volume, contour, lang, format, stream, count, callback) {
 	//This is the callback to our saveAudio function.
     // It takes a single argument, which is the returned accessToken.
 //	console.log(text + ' start');
-    saveAudio(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback);
+    saveAudio(text, name, role, style, rate, pitch, volume, contour, lang, format, stream, count, callback);
 }
 
 //var accessToken = '';
@@ -121,7 +121,7 @@ var getAccessTokens = function() {
  * contour 音调
  * lang 语言
  */
-var saveAudio = async function(text, name, role, style, rate, pitch, volume, contour, lang, stream, count, callback) {
+var saveAudio = async function(text, name, role, style, rate, pitch, volume, contour, lang, format, stream, count, callback) {
  let time = (new Date()).getTime();
  let md5 = crypto.createHash('md5');
  if(name === undefined) {
@@ -148,8 +148,11 @@ var saveAudio = async function(text, name, role, style, rate, pitch, volume, con
  if(lang === undefined) {
      lang = 'zh-CN';//语言
  }
+ if(format === undefined) {
+     format = 'riff-24khz-16bit-mono-pcm';
+ }
  console.log('lang', lang);
- let key = text + '_' + name + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+ let key = text + '_' + name + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang+ '_' + format;
  console.log('key', key);
  let result = md5.update(key).digest('hex');
  let filePath = __dirname + path.sep + 'wav' + path.sep + result + '.wav';
@@ -184,7 +187,7 @@ var saveAudio = async function(text, name, role, style, rate, pitch, volume, con
             'Authorization': 'Bearer ' + accessToken.token,
             'cache-control': 'no-cache',
             'User-Agent': 'YOUR_RESOURCE_NAME',
-            'X-Microsoft-OutputFormat': 'riff-24khz-16bit-mono-pcm',
+            'X-Microsoft-OutputFormat': format,
             'Content-Type': 'application/ssml+xml'
         },
     //     body: '<speak version=\'1.0\' xmlns="http://www.w3.org/2001/10/synthesis" xml:lang=\'en-US\'>\n<voice  name=\'Microsoft Server Speech Text to Speech Voice (en-US, Jessa24kRUS)\'>' + text + '</voice> </speak>'
@@ -237,7 +240,7 @@ var saveAudio = async function(text, name, role, style, rate, pitch, volume, con
 var get = function(n) {
 	let text = '你好' + n;
 	let filename = __dirname + '/test' + n + 'sample.wav';
-	textToSpeech(text, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, fs.createWriteStream(filename), 0, function(){
+	textToSpeech(text, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, fs.createWriteStream(filename), 0, function(){
 		console.log('test ok ' + n);
 	});
 }
@@ -349,6 +352,7 @@ if(!start_server) {
                     let volume = arg.volume;
                     let contour = arg.contour;
                     let lang = arg.lang;
+                    let format = arg.format;
                     if(name === undefined) {
                         name = 'zh-CN-XiaoxiaoNeural';//发音者
                     }
@@ -373,6 +377,9 @@ if(!start_server) {
                     if(lang === undefined) {
                         lang = 'zh-CN';//语言
                     }
+                    if(format === undefined) {
+                        format = 'riff-24khz-16bit-mono-pcm';
+                    }
                     //Start the sample app.
                     if(pathname == '/download') {
                         let md5 = crypto.createHash('md5');
@@ -391,7 +398,7 @@ if(!start_server) {
         			// textToSpeech(text, res, 0, function(){
         			// 	console.log('send', text);
         			// });
-                    bagpipe.push(textToSpeech, text, name, role, style, rate, pitch, volume, contour, lang, res, 0, function() {
+                    bagpipe.push(textToSpeech, text, name, role, style, rate, pitch, volume, contour, lang, format, res, 0, function() {
                         console.log('send', text);
                     });
                 } else {

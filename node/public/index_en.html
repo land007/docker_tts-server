@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>神经网络语音</title>
+<script type="text/javascript">
+    var getKey = function(){
+        let text = document.getElementById('text').value;
+        let role = document.getElementById('role').value;
+        let style = document.getElementById('style').value;
+        let rate = document.getElementById('rate').value;
+        let pitch = document.getElementById('pitch').value;
+        let volume = document.getElementById('volume').value;
+        let contour = document.getElementById('contour').value;
+        let lang = document.getElementById('lang').value;//zh-CN
+        let types = document.getElementsByName('type');
+        let type;
+        for(let t in types) {
+            if(types[t].checked) {
+                type = types[t].value;
+                break;
+            }
+        }
+        let key = text + '_' + type + '_' + role + '_' + style + '_' + rate + '_' + pitch + '_' + volume + '_' + contour + '_' + lang;
+        return key;
+    };
+    var getURL = function(){
+        let text = document.getElementById('text').value;
+        let role = document.getElementById('role').value;
+        let style = document.getElementById('style').value;
+        let rate = document.getElementById('rate').value;
+        let pitch = document.getElementById('pitch').value;
+        let volume = document.getElementById('volume').value;
+        let contour = document.getElementById('contour').value;
+        let lang = document.getElementById('lang').value;//zh-CN
+        let types = document.getElementsByName('type');
+        let type;
+        for(let t in types) {
+            if(types[t].checked) {
+                type = types[t].value;
+                break;
+            }
+        }
+        let url = 'text=' + encodeURI(text) + '&name=' + type + '&role=' + role + '&style=' + style + '&rate=' + rate + '&pitch=' + pitch + '&volume=' + volume + '&contour=' + contour + '&lang=' + lang;
+        return url;
+    };
+    var stop = function(){
+        var key = getKey();
+        if(window.audios[key] !== undefined) {
+            window.audios[key].pause();
+        }
+    };
+    var start = function() {
+        let key = getKey();
+        let url = getURL();
+        if(!window.audios) {
+            window.audios = {};
+        }
+        if(window.audios[key] === undefined) {
+            let src = 'https://docx.qhkly.com:20080/audo?' + url;
+            console.log('src', src);
+            window.audios[key] = new Audio(src);
+        }
+        window.audios[key].play();
+    };
+    var download = function() {
+        let key = getKey();
+        let url = getURL();
+        let src = 'https://docx.qhkly.com:20080/download?' + url;
+        console.log('src', src);
+        location.href = src;
+    };
+</script>
+</head>
+<body>
+		<div>
+			<textarea id="text" name="text" style="width: 815px; height: 233px;">In some cases, you can adjust the speaking style to express different emotions like cheerfulness, empathy, and calm. You can optimize the voice for different scenarios like customer service, newscast, and voice assistant. With roles, the same voice can act as a different age and gender.</textarea>
+		</div>
+		<div>
+			<input type="radio" value="en-US-AriaNeural" name="type" checked>AriaNeural
+			<input type="radio" value="en-US-GuyNeural" name="type">GuyNeural
+			<input type="radio" value="en-US-JennyNeural" name="type">JennyNeural
+			<input type="radio" value="en-US-SaraNeural" name="type">SaraNeural
+		</div>
+		<div>
+            角色扮演
+			<select id="role" >
+                <option value="Default">默认</option>
+                <option value ="YoungAdultMale">男青年</option>
+                <option value ="YoungAdultFemale">女青年</option>
+                <option value ="OlderAdultMale">男中年</option>
+                <option value ="OlderAdultFemale">女中年</option>
+                <option value ="SeniorMale">男老年</option>
+                <option value ="SeniorFemale">女老年</option>
+                <option value ="Boy">男孩</option>
+                <option value ="Girl">女孩</option>
+            </select>
+            说话风格
+			<select id="style" >
+                <option value="Default">默认</option>
+                <option value="volvo">平静</option>
+                <option value="cheerful">开心</option>
+                <option value="sad">悲伤</option>
+                <option value="angry">愤怒</option>
+                <option value="fearful">恐惧</option>
+                <option value="disgruntled">不满</option>
+                <option value="serious">严厉</option>
+                <option value="disgruntled">不满</option>
+                <option value="affectionate">撒娇</option>
+                <option value="gentle">温柔</option>
+                <option value="depressed">沮丧</option>
+                <option value="embarrassed">尴尬</option>
+                <option value="serious">严肃</option>
+                <option value="affectionate">温柔</option>
+            </select>
+		</div>
+		<div>
+            语言
+			<input id="lang" type="text" value="en-US">
+            语速
+			<input id="rate" type="text" value="0">
+            音高
+			<input id="pitch" type="text" value="0">
+            音量
+			<input id="volume" type="text" value="0">
+            音调
+			<input id="contour" type="text" value="">
+			<input type="button" value="播放" onclick="start();">
+			<input type="button" value="暂停" onclick="stop();">
+            <input type="button" value="下载" onclick="download();">
+		</div>
+</body>
+</html>
