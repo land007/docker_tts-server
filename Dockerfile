@@ -10,6 +10,9 @@ RUN echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
 #RUN . $HOME/.nvm/nvm.sh && cd / && npm install basic-auth
 ADD node /node_
 
+ENV SERVICE_REGION=westus\
+	SUBSCRIPTION_KEY=6e83631f53fb4a07b0cde7cf8fab0b26
+
 #docker build -t land007/tts-server:latest .
 #docker run -it --restart=always -p 20080:80 --name tts-server land007/tts-server:latest
 #> docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 -t land007/tts-server:latest --push .

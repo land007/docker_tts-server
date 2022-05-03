@@ -17,27 +17,16 @@ const join = path.join;
 const sep = path.sep;
 const www = 'public';
 const root = normalize(__dirname + sep + www + sep);
+const subscriptionKey = process.env['SUBSCRIPTION_KEY'] || "6e83631f53fb4a07b0cde7cf8fab0b26";
+const serviceRegion = process.env['SERVICE_REGION'] || "westus"; // e.g., "westus"
 
 /*
  * These lines will attempt to read your subscription key from an environment
  * variable. If you prefer to hardcode the subscription key for ease of use,
  * replace process.env.SUBSCRIPTION_KEY with your subscription key as a string.
  */
-//const subscriptionKey = 'e48db9d75ce94ad4bb2ac7e2814baf1b';//process.env.SUBSCRIPTION_KEY;
-//const subscriptionKeys = ['e48db9d75ce94ad4bb2ac7e2814baf1b'];//westus test
-//const subscriptionKeys = ['4c34eda7c3974544b34f5a6314e9e9f9', '06098a76119343c2acfc58c0733b13d4'];//westus
-//const subscriptionKeys = ['7d9c971f039840a78c6abcaa6238f36c'];//eastasia
-//const subscriptionKeys = ['520fe64290984004944fecf905bd69b0'];//southeastasia
 const subscriptionKeys = [
-//	{key: 'e48db9d75ce94ad4bb2ac7e2814baf1b', region: 'westus'},//美国西部
-//	{key: '4c34eda7c3974544b34f5a6314e9e9f9', region: 'westus'},//美国西部
-//	{key: 'a0702e243c8d4af498eea13ca3d48075', region: 'westus2'},//美国西部2
-//	{key: '9874a9bd13d04336b9ffc47c3ba49d97', region: 'eastus'},//美国东部
-//	{key: '73e15a97036c49b6bff7b13f5ad11b91', region: 'eastus2'},//美国东部2
-//	{key: '7d9c971f039840a78c6abcaa6238f36c', region: 'eastasia'},//东亚
-	{key: 'ca61b46813b24bc49722f23d9c0517f2', region: 'southeastasia'},//东南亚
-//	{key: '9257a8f8d9054db18a247670a2fc54d0', region: 'northeurope'},//北欧
-//	{key: '24d126d4fa0842eebe08ce6b9f6e31b9', region: 'westeurope'},//西欧
+	{key: subscriptionKey, region: serviceRegion}
 ];
 //if (!subscriptionKey) {
 if (subscriptionKeys.length < 1) {
